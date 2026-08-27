@@ -13,7 +13,10 @@ class UserServiceIntegrationTest {
     private UserService userService;
 
     @Test
-    void shouldInjectRepositoryAndReturnUsername() {
-        assertEquals("user-1001", userService.getUsernameById(1001));
+    void shouldInjectRepositoryAndManageUsers() {
+        User createdUser = userService.createUser("alice");
+
+        assertEquals("alice", createdUser.username());
+        assertEquals(createdUser, userService.findUserById(createdUser.id()).orElseThrow());
     }
 }

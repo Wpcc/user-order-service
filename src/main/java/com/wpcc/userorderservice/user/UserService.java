@@ -1,5 +1,7 @@
 package com.wpcc.userorderservice.user;
 
+import java.util.Optional;
+
 import org.springframework.stereotype.Service;
 
 @Service
@@ -10,7 +12,11 @@ public class UserService {
     this.userRepository = userRepository;
   }
 
-  public String getUsernameById(long id) {
-    return userRepository.findUserNameById(id);
+  public User createUser(String username) {
+    return userRepository.save(username);
+  }
+
+  public Optional<User> findUserById(long id) {
+    return userRepository.findById(id);
   }
 }
