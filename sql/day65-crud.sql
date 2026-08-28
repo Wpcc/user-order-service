@@ -19,14 +19,25 @@ SET stock = stock - 2
 WHERE id = 1 AND stock >= 2;
 
 -- 4.新增订单
-INSERT INTO orders (user_id,product_id,quantity,total_amount,status)
-VALUES (1,1,2,598.00,'PENDING');
+INSERT INTO orders (
+    user_id,
+    product_id,
+    product_name,
+    product_price,
+    quantity,
+    total_amount,
+    status
+)
+VALUES (1, 1, 'Mechanical Keyboard', 299.00, 2, 598.00, 'PENDING');
 
 -- 5.查询订单，并关联查询用户名和商品名
 SELECT
   o.id,
   u.username,
-  p.name AS product_name,
+  o.product_name AS ordered_product_name,
+  o.product_price AS ordered_product_price,
+  p.name AS current_product_name,
+  p.price AS current_product_price,
   o.quantity,
   o.total_amount,
   o.status,

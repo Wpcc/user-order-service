@@ -23,6 +23,8 @@ CREATE TABLE orders (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
     user_id BIGINT NOT NULL,
     product_id BIGINT NOT NULL,
+    product_name VARCHAR(128) NOT NULL,
+    product_price DECIMAL(10, 2) NOT NULL,
     quantity INT NOT NULL,
     total_amount DECIMAL(10, 2) NOT NULL,
     status VARCHAR(32) NOT NULL DEFAULT 'PENDING',
