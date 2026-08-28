@@ -31,3 +31,6 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# 本地数据库凭据，严禁提交
+.env
