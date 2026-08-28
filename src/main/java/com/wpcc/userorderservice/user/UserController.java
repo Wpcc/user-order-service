@@ -2,6 +2,10 @@ package com.wpcc.userorderservice.user;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.wpcc.userorderservice.user.dto.CreateUserRequest;
+import com.wpcc.userorderservice.user.dto.UserResponse;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,16 +23,20 @@ public class UserController {
   }
 
   @PostMapping
-  public ResponseEntity<User> createUser(@RequestBody User user) {
-    User createdUser = userService.createUser(user.username());
-    return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
+  public ResponseEntity<UserResponse> createUser(@RequestBody CreateUserRequest user) {
+    User createUser = userService.createUser(user.username());
+    return ResponseEntity.status(HttpStatus.CREATED).body(toResponse(createUser));
   }
 
   @GetMapping("/{id}")
-  public ResponseEntity<User> findUserById(@PathVariable long id) {
+  public ResponseEntity<UserResponse> findUserById(@PathVariable long id) {
     return userService.findUserById(id)
-        .map(ResponseEntity::ok)
+        .map(user -> ResponseEntity.ok(toResponse(user)))
         .orElseGet(() -> ResponseEntity.notFound().build());
+  }
+
+  private UserResponse toResponse(User user) {
+    return new UserResponse(user.id(), user.username());
   }
 
 }
