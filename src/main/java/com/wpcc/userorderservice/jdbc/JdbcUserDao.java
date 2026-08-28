@@ -19,7 +19,11 @@ public class JdbcUserDao {
     this.password = password;
   }
 
-  public long save(String username) throws SQLException {
+  public long save(String username) {
+    if (username == null || username.isBlank()) {
+      throw new IllegalArgumentException("用户名不能为空");
+    }
+
     String sql = "INSERT INTO users (username) VALUES (?)";
 
     try (Connection connection = DriverManager.getConnection(url, this.username, password);
@@ -28,7 +32,7 @@ public class JdbcUserDao {
 
       int affectedRows = statement.executeUpdate();
       if (affectedRows == 0) {
-        throw new SQLException("新增用户失败，没有影响任何数据。");
+        throw new JdbcDataAccessException("保存用户失败", null);
       }
 
       try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
@@ -37,11 +41,17 @@ public class JdbcUserDao {
         }
       }
 
-      throw new SQLException("新增用户成功，但没有获取到生成的 id。");
+      throw new JdbcDataAccessException("保存用户失败", null);
+    } catch (SQLException e) {
+      throw new JdbcDataAccessException("保存用户失败", e);
     }
   }
 
-  public Optional<JdbcUser> findById(long id) throws SQLException {
+  public Optional<JdbcUser> findById(long id) {
+    if (id <= 0) {
+      throw new IllegalArgumentException("id 必须大于 0");
+    }
+
     String sql = "SELECT id, username FROM users WHERE id = ?";
 
     try (Connection connection = DriverManager.getConnection(url, username, password);
@@ -59,6 +69,34 @@ public class JdbcUserDao {
 
         return Optional.empty();
       }
+    } catch (SQLException e) {
+      throw new JdbcDataAccessException("按 id 查询用户失败", e);
+    }
+  }
+
+  public Optional<JdbcUser> findByUsername(String username) {
+    if (username == null || username.isBlank()) {
+      throw new IllegalArgumentException("用户名不能为空");
+    }
+
+    String sql = "SELECT id, username FROM users WHERE username = ?";
+
+    try (Connection connection = DriverManager.getConnection(url, this.username, password);
+        PreparedStatement statement = connection.prepareStatement(sql)) {
+
+      statement.setString(1, username);
+
+      try (ResultSet resultSet = statement.executeQuery()) {
+        if (resultSet.next()) {
+          return Optional.of(new JdbcUser(
+              resultSet.getLong("id"),
+              resultSet.getString("username")));
+        }
+
+        return Optional.empty();
+      }
+    } catch (SQLException e) {
+      throw new JdbcDataAccessException("按用户名查询用户失败", e);
     }
   }
 }

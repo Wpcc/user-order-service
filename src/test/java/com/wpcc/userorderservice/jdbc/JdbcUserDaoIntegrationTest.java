@@ -1,6 +1,7 @@
 package com.wpcc.userorderservice.jdbc;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.sql.Connection;
@@ -28,13 +29,36 @@ class JdbcUserDaoIntegrationTest {
 
     try {
       Optional<JdbcUser> savedUser = userDao.findById(id);
+      Optional<JdbcUser> userFoundByUsername = userDao.findByUsername(username);
 
       assertTrue(savedUser.isPresent());
       assertEquals(id, savedUser.orElseThrow().id());
       assertEquals(username, savedUser.orElseThrow().username());
+      assertTrue(userFoundByUsername.isPresent());
+      assertEquals(id, userFoundByUsername.orElseThrow().id());
     } finally {
       deleteUser(url, databaseUsername, password, id);
     }
+  }
+
+  @Test
+  void rejectsInvalidParametersBeforeConnectingToDatabase() {
+    JdbcUserDao userDao = new JdbcUserDao("invalid-url", "unused", "unused");
+
+    assertThrows(IllegalArgumentException.class, () -> userDao.save(" "));
+    assertThrows(IllegalArgumentException.class, () -> userDao.findById(0));
+    assertThrows(IllegalArgumentException.class, () -> userDao.findByUsername(null));
+  }
+
+  @Test
+  void wrapsSqlExceptionAsDataAccessException() {
+    JdbcUserDao userDao = new JdbcUserDao("invalid-url", "unused", "unused");
+
+    JdbcDataAccessException exception = assertThrows(JdbcDataAccessException.class,
+        () -> userDao.findById(1));
+
+    assertEquals("按 id 查询用户失败", exception.getMessage());
+    assertTrue(exception.getCause() instanceof SQLException);
   }
 
   private static boolean hasText(String value) {

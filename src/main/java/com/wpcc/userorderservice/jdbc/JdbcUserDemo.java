@@ -1,7 +1,5 @@
 package com.wpcc.userorderservice.jdbc;
 
-import java.sql.SQLException;
-
 public class JdbcUserDemo {
   public static void main(String[] args) {
     JdbcUserDao userDao = new JdbcUserDao(
@@ -16,7 +14,10 @@ public class JdbcUserDemo {
 
       userDao.findById(id)
           .ifPresent(System.out::println);
-    } catch (SQLException e) {
+
+      userDao.findByUsername(username)
+          .ifPresent(System.out::println);
+    } catch (JdbcDataAccessException e) {
       System.err.println("数据库操作失败：" + e.getMessage());
       e.printStackTrace();
     }
