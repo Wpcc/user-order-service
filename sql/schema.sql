@@ -31,5 +31,5 @@ CREATE TABLE orders (
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_orders_user FOREIGN KEY (user_id) REFERENCES users(id),
     CONSTRAINT fk_orders_product FOREIGN KEY (product_id) REFERENCES products(id),
-    INDEX idx_orders_user_id (user_id)
+    INDEX idx_orders_user_status_created_at (user_id, status, created_at)
 ) ENGINE = InnoDB;
