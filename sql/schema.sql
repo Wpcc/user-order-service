@@ -33,3 +33,19 @@ CREATE TABLE orders (
     CONSTRAINT fk_orders_product FOREIGN KEY (product_id) REFERENCES products(id),
     INDEX idx_orders_user_status_created_at (user_id, status, created_at)
 ) ENGINE = InnoDB;
+
+CREATE TABLE order_items(
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  order_id BIGINT NOT NULL,
+  product_id BIGINT NOT NULL,
+  product_name VARCHAR(128) NOT NULL,
+  product_price DECIMAL(10,2) NOT NULL,
+  quantity INT NOT NULL,
+  subtotal_amount DECIMAL(10,2) NOT NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_order_items_order
+    FOREIGN KEY (order_id) REFERENCES orders(id),
+  CONSTRAINT fk_order_items_product
+    FOREIGN KEY (product_id) REFERENCES products(id),
+  INDEX idx_order_items_order_id (order_id)
+) ENGINE = InnoDB;
