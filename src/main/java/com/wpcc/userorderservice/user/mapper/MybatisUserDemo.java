@@ -17,5 +17,8 @@ public class MybatisUserDemo implements CommandLineRunner {
   public void run(String... args) {
     userMapper.findById(1L)
         .ifPresentOrElse(System.out::println, () -> System.out.println("未找到 id=1 的用户"));
+
+    userMapper.findAll()
+        .forEach(System.out::println);
   }
 }
