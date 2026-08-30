@@ -22,5 +22,8 @@ public class MybatisOrderDemo implements CommandLineRunner {
 
     orderMapper.findItemsByOrderId(1)
         .forEach(System.out::println);
+
+    orderMapper.findByCondition(1L, OrderStatus.PENDING)
+        .forEach(System.out::println);
   }
 }

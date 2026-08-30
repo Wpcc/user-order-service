@@ -23,4 +23,21 @@ public interface OrderMapper {
       ORDER BY id
       """)
   List<DatabaseOrderItem> findItemsByOrderId(@Param("orderId") long orderId);
+
+  @Select("""
+      <script>
+        SELECT id,user_id,total_amount,status
+        FROM orders
+        <where>
+          <if test="userId != null">
+            AND user_id = #{userId}
+          </if>
+          <if test="status != null">
+            AND status = #{status}
+          </if>
+        </where>
+        ORDER BY id DESC
+      </script>
+      """)
+  List<DatabaseOrder> findByCondition(@Param("userId") Long userId, @Param("status") OrderStatus status);
 }
