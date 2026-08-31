@@ -2,7 +2,9 @@ package com.wpcc.userorderservice.order.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -15,8 +17,11 @@ import org.junit.jupiter.api.Test;
 
 import com.wpcc.userorderservice.order.dto.CreateOrderRequest;
 import com.wpcc.userorderservice.order.dto.OrderPreview;
+import com.wpcc.userorderservice.order.mapper.OrderInsertCommand;
+import com.wpcc.userorderservice.order.mapper.OrderMapper;
 import com.wpcc.userorderservice.product.mapper.DatabaseProduct;
 import com.wpcc.userorderservice.product.mapper.ProductMapper;
+import com.wpcc.userorderservice.product.service.ProductStockService;
 import com.wpcc.userorderservice.user.mapper.DatabaseUser;
 import com.wpcc.userorderservice.user.mapper.UserMapper;
 
@@ -24,13 +29,18 @@ class OrderCreationServiceTest {
 
   private UserMapper userMapper;
   private ProductMapper productMapper;
+  private OrderMapper orderMapper;
+  private ProductStockService productStockService;
   private OrderCreationService orderCreationService;
 
   @BeforeEach
   void setUp() {
     userMapper = mock(UserMapper.class);
     productMapper = mock(ProductMapper.class);
-    orderCreationService = new OrderCreationService(userMapper, productMapper);
+    orderMapper = mock(OrderMapper.class);
+    productStockService = mock(ProductStockService.class);
+    orderCreationService = new OrderCreationService(
+        userMapper, productMapper, orderMapper, productStockService);
   }
 
   @Test
@@ -71,5 +81,58 @@ class OrderCreationServiceTest {
         () -> orderCreationService.preview(new CreateOrderRequest(1L, 10L, 1)));
 
     assertEquals("商品不存在：10", exception.getMessage());
+  }
+
+  @Test
+  void createsOrderAndOrderItemAfterDecreasingStock() {
+    prepareValidOrder();
+    when(orderMapper.insert(any(OrderInsertCommand.class))).thenAnswer(invocation -> {
+      OrderInsertCommand command = invocation.getArgument(0);
+      command.setId(100L);
+      return 1;
+    });
+    when(orderMapper.insertItem(any())).thenReturn(1);
+
+    long orderId = orderCreationService.create(new CreateOrderRequest(1L, 10L, 3));
+
+    assertEquals(100L, orderId);
+    verify(productStockService).decreaseStock(10L, 3);
+    verify(orderMapper).insert(any(OrderInsertCommand.class));
+    verify(orderMapper).insertItem(any());
+  }
+
+  @Test
+  void rejectsOrderCreationWhenOrderInsertFails() {
+    prepareValidOrder();
+    when(orderMapper.insert(any(OrderInsertCommand.class))).thenReturn(0);
+
+    IllegalStateException exception = assertThrows(IllegalStateException.class,
+        () -> orderCreationService.create(new CreateOrderRequest(1L, 10L, 3)));
+
+    assertEquals("创建订单失败", exception.getMessage());
+    verify(productStockService).decreaseStock(10L, 3);
+    verify(orderMapper, never()).insertItem(any());
+  }
+
+  @Test
+  void rejectsOrderCreationWhenOrderItemInsertFails() {
+    prepareValidOrder();
+    when(orderMapper.insert(any(OrderInsertCommand.class))).thenAnswer(invocation -> {
+      OrderInsertCommand command = invocation.getArgument(0);
+      command.setId(100L);
+      return 1;
+    });
+    when(orderMapper.insertItem(any())).thenReturn(0);
+
+    IllegalStateException exception = assertThrows(IllegalStateException.class,
+        () -> orderCreationService.create(new CreateOrderRequest(1L, 10L, 3)));
+
+    assertEquals("创建订单详情失败", exception.getMessage());
+  }
+
+  private void prepareValidOrder() {
+    when(userMapper.findById(1L)).thenReturn(Optional.of(new DatabaseUser(1L, "alice")));
+    when(productMapper.findById(10L)).thenReturn(Optional.of(
+        new DatabaseProduct(10L, "Keyboard", new BigDecimal("199.90"), 20)));
   }
 }

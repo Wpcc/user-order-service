@@ -6,6 +6,7 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 
 import com.wpcc.userorderservice.product.mapper.ProductMapper;
+import com.wpcc.userorderservice.order.mapper.OrderMapper;
 import com.wpcc.userorderservice.user.mapper.UserMapper;
 
 @TestConfiguration(proxyBeanMethods = false)
@@ -19,5 +20,10 @@ public class TestMapperConfiguration {
   @Bean
   ProductMapper productMapper() {
     return mock(ProductMapper.class);
+  }
+
+  @Bean
+  OrderMapper orderMapper() {
+    return mock(OrderMapper.class);
   }
 }

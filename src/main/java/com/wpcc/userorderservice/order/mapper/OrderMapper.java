@@ -3,7 +3,9 @@ package com.wpcc.userorderservice.order.mapper;
 import java.util.List;
 import java.util.Optional;
 
+import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Options;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
@@ -76,4 +78,23 @@ public interface OrderMapper {
       @Param("offset") int offset,
       @Param("sortField") OrderSortField sortField,
       @Param("direction") SortDirection direction);
+
+  @Insert("""
+      INSERT INTO orders (user_id,product_id,product_name,product_price,quantity,total_amount,status)
+      VALUES (
+        #{userId}, #{productId}, #{productName}, #{productPrice},
+        #{quantity}, #{totalAmount}, 'PENDING'
+      )
+      """)
+  @Options(useGeneratedKeys = true, keyProperty = "id", keyColumn = "id")
+  int insert(OrderInsertCommand order);
+
+  @Insert("""
+      INSERT INTO order_items (order_id,product_id,product_name,product_price,quantity,subtotal_amount)
+      VALUES (
+        #{orderId}, #{productId}, #{productName}, #{productPrice},
+        #{quantity}, #{subtotalAmount}
+      )
+      """)
+  int insertItem(OrderItemInsertCommand item);
 }
