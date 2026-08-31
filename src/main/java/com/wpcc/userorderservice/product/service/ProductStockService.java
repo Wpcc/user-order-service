@@ -1,6 +1,7 @@
 package com.wpcc.userorderservice.product.service;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.wpcc.userorderservice.product.mapper.DatabaseProduct;
 import com.wpcc.userorderservice.product.mapper.ProductMapper;
@@ -13,6 +14,7 @@ public class ProductStockService {
     this.productMapper = productMapper;
   }
 
+  @Transactional
   public void decreaseStock(long productId, int quantity) {
     if (quantity < 1) {
       throw new IllegalArgumentException("数量必须大于等于 1");
