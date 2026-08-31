@@ -50,6 +50,26 @@ class ProductMapperIntegrationTest {
     }
   }
 
+  @Test
+  void preventsStockFromBecomingNegative() throws SQLException {
+    String name = "mybatis-stock-test-" + System.currentTimeMillis();
+
+    try {
+      assertEquals(1, productMapper.insert(name, new BigDecimal("1.00"), 1));
+
+      DatabaseProduct product = productMapper.findPage(100, 0).stream()
+          .filter(candidate -> name.equals(candidate.name()))
+          .findFirst()
+          .orElseThrow();
+
+      assertEquals(1, productMapper.decreaseStock(product.id(), 1));
+      assertEquals(0, productMapper.decreaseStock(product.id(), 1));
+      assertEquals(0, productMapper.findById(product.id()).orElseThrow().stock());
+    } finally {
+      deleteProductByName(name);
+    }
+  }
+
   private void deleteProductByName(String name) throws SQLException {
     try (Connection connection = dataSource.getConnection();
         PreparedStatement statement = connection.prepareStatement(

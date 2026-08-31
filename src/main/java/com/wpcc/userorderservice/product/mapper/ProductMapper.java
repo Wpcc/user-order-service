@@ -37,6 +37,7 @@ public interface ProductMapper {
         UPDATE products
         SET stock = stock - #{quantity}
         WHERE id = #{id}
+          AND stock >= #{quantity}
       """)
   int decreaseStock(@Param("id") long id, @Param("quantity") int quantity);
 }

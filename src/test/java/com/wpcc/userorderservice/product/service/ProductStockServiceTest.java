@@ -73,10 +73,10 @@ class ProductStockServiceTest {
     when(productMapper.findById(10L)).thenReturn(Optional.of(productWithStock(5)));
     when(productMapper.decreaseStock(10L, 3)).thenReturn(0);
 
-    IllegalStateException exception = assertThrows(IllegalStateException.class,
+    IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
         () -> productStockService.decreaseStock(10L, 3));
 
-    assertEquals("库存扣减失败：10", exception.getMessage());
+    assertEquals("库存不足：10", exception.getMessage());
   }
 
   private DatabaseProduct productWithStock(int stock) {

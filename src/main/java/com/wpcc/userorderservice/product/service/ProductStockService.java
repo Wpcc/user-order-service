@@ -29,7 +29,7 @@ public class ProductStockService {
 
     int result = productMapper.decreaseStock(productId, quantity);
     if (result != 1) {
-      throw new IllegalStateException("库存扣减失败：" + productId);
+      throw new IllegalArgumentException("库存不足：" + productId);
     }
   }
 }
