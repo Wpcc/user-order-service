@@ -25,5 +25,15 @@ public class MybatisOrderDemo implements CommandLineRunner {
 
     orderMapper.findByCondition(1L, OrderStatus.PENDING)
         .forEach(System.out::println);
+
+    System.out.println("------- 分页打印数据---------");
+    OrderPageRequest request = new OrderPageRequest(1, 10, OrderSortField.CREATED_AT, SortDirection.DESC);
+    orderMapper.findPage(
+        request.size(),
+        request.offset(),
+        request.sortField(),
+        request.direction())
+        .forEach(System.out::println);
+    System.out.println("------- 分页打印数据---------");
   }
 }

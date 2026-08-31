@@ -62,4 +62,20 @@ class OrderMapperIntegrationTest {
         order.userId().equals(existingOrder.userId())
             && order.status() == existingOrder.status()));
   }
+
+  @Test
+  void returnsSortedOrderPages() {
+    List<DatabaseOrder> descendingPage = orderMapper.findPage(
+        10, 0, OrderSortField.ID, SortDirection.DESC);
+    assertFalse(descendingPage.isEmpty());
+    assertTrue(descendingPage.size() <= 10);
+    assertTrue(IntStream.range(1, descendingPage.size())
+        .allMatch(index -> descendingPage.get(index - 1).id() > descendingPage.get(index).id()));
+
+    List<DatabaseOrder> ascendingPage = orderMapper.findPage(
+        10, 0, OrderSortField.ID, SortDirection.ASC);
+    assertFalse(ascendingPage.isEmpty());
+    assertTrue(IntStream.range(1, ascendingPage.size())
+        .allMatch(index -> ascendingPage.get(index - 1).id() < ascendingPage.get(index).id()));
+  }
 }

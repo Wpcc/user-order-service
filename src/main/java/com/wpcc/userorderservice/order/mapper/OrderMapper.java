@@ -40,4 +40,40 @@ public interface OrderMapper {
       </script>
       """)
   List<DatabaseOrder> findByCondition(@Param("userId") Long userId, @Param("status") OrderStatus status);
+
+  @Select("""
+      <script>
+        SELECT id,user_id,total_amount,status
+        FROM orders
+        ORDER BY
+        <choose>
+          <when test="sortField.name() == 'ID'">
+            id
+          </when>
+          <when test="sortField.name() == 'TOTAL_AMOUNT'">
+            total_amount
+          </when>
+          <when test="sortField.name() == 'CREATED_AT'">
+            created_at
+          </when>
+          <otherwise>
+            id
+          </otherwise>
+        </choose>
+        <choose>
+          <when test="direction.name() == 'ASC'">
+              ASC
+          </when>
+          <otherwise>
+              DESC
+          </otherwise>
+        </choose>
+        LIMIT #{limit} OFFSET #{offset}
+      </script>
+      """)
+  List<DatabaseOrder> findPage(
+      @Param("limit") int limit,
+      @Param("offset") int offset,
+      @Param("sortField") OrderSortField sortField,
+      @Param("direction") SortDirection direction);
 }
