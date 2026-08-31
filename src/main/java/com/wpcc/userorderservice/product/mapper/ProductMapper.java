@@ -8,6 +8,7 @@ import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 
 @Mapper
 public interface ProductMapper {
@@ -31,4 +32,11 @@ public interface ProductMapper {
       LIMIT #{limit} OFFSET #{offset}
       """)
   List<DatabaseProduct> findPage(@Param(value = "limit") int limit, @Param("offset") int offset);
+
+  @Update("""
+        UPDATE products
+        SET stock = stock - #{quantity}
+        WHERE id = #{id}
+      """)
+  int decreaseStock(@Param("id") long id, @Param("quantity") int quantity);
 }
