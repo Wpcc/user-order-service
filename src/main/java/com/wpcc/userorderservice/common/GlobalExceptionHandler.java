@@ -6,6 +6,9 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import com.wpcc.userorderservice.common.exception.InsufficientStockException;
+import com.wpcc.userorderservice.common.exception.ResourceNotFoundException;
+
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -43,5 +46,29 @@ public class GlobalExceptionHandler {
         Map.of());
 
     return ResponseEntity.badRequest().body(response);
+  }
+
+  @ExceptionHandler(ResourceNotFoundException.class)
+  public ResponseEntity<ApiErrorResponse> handleResourceNotFound(
+      ResourceNotFoundException exception) {
+
+    ApiErrorResponse response = new ApiErrorResponse(
+        HttpStatus.NOT_FOUND.value(),
+        exception.getMessage(),
+        Map.of());
+
+    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+  }
+
+  @ExceptionHandler(InsufficientStockException.class)
+  public ResponseEntity<ApiErrorResponse> handleInsufficientStock(
+      InsufficientStockException exception) {
+
+    ApiErrorResponse response = new ApiErrorResponse(
+        HttpStatus.CONFLICT.value(),
+        exception.getMessage(),
+        Map.of());
+
+    return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
   }
 }

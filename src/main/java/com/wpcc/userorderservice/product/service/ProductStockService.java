@@ -3,6 +3,8 @@ package com.wpcc.userorderservice.product.service;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.wpcc.userorderservice.common.exception.InsufficientStockException;
+import com.wpcc.userorderservice.common.exception.ResourceNotFoundException;
 import com.wpcc.userorderservice.product.mapper.DatabaseProduct;
 import com.wpcc.userorderservice.product.mapper.ProductMapper;
 
@@ -21,15 +23,15 @@ public class ProductStockService {
     }
 
     DatabaseProduct product = productMapper.findById(productId)
-        .orElseThrow(() -> new IllegalArgumentException("商品不存在：" + productId));
+        .orElseThrow(() -> new ResourceNotFoundException("商品不存在：" + productId));
 
     if (product.stock() < quantity) {
-      throw new IllegalArgumentException("库存不足：" + productId);
+      throw new InsufficientStockException("库存不足：" + productId);
     }
 
     int result = productMapper.decreaseStock(productId, quantity);
     if (result != 1) {
-      throw new IllegalArgumentException("库存不足：" + productId);
+      throw new InsufficientStockException("库存不足：" + productId);
     }
   }
 }

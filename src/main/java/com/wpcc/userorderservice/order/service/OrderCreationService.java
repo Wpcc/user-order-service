@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.wpcc.userorderservice.common.exception.ResourceNotFoundException;
 import com.wpcc.userorderservice.order.dto.CreateOrderRequest;
 import com.wpcc.userorderservice.order.dto.OrderPreview;
 import com.wpcc.userorderservice.order.mapper.OrderInsertCommand;
@@ -32,10 +33,10 @@ public class OrderCreationService {
 
   public OrderPreview preview(CreateOrderRequest request) {
     userMapper.findById(request.userId())
-        .orElseThrow(() -> new IllegalArgumentException("用户不存在：" + request.userId()));
+        .orElseThrow(() -> new ResourceNotFoundException("用户不存在：" + request.userId()));
 
     DatabaseProduct product = productMapper.findById(request.productId())
-        .orElseThrow(() -> new IllegalArgumentException("商品不存在：" + request.productId()));
+        .orElseThrow(() -> new ResourceNotFoundException("商品不存在：" + request.productId()));
 
     BigDecimal totalAmount = product.price()
         .multiply(BigDecimal.valueOf(request.quantity()));

@@ -15,6 +15,7 @@ import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import com.wpcc.userorderservice.common.exception.ResourceNotFoundException;
 import com.wpcc.userorderservice.order.dto.CreateOrderRequest;
 import com.wpcc.userorderservice.order.dto.OrderPreview;
 import com.wpcc.userorderservice.order.mapper.OrderInsertCommand;
@@ -65,7 +66,7 @@ class OrderCreationServiceTest {
   void rejectsPreviewWhenUserDoesNotExist() {
     when(userMapper.findById(1L)).thenReturn(Optional.empty());
 
-    IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+    ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class,
         () -> orderCreationService.preview(new CreateOrderRequest(1L, 10L, 1)));
 
     assertEquals("用户不存在：1", exception.getMessage());
@@ -77,7 +78,7 @@ class OrderCreationServiceTest {
     when(userMapper.findById(1L)).thenReturn(Optional.of(new DatabaseUser(1L, "alice")));
     when(productMapper.findById(10L)).thenReturn(Optional.empty());
 
-    IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+    ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class,
         () -> orderCreationService.preview(new CreateOrderRequest(1L, 10L, 1)));
 
     assertEquals("商品不存在：10", exception.getMessage());

@@ -14,6 +14,8 @@ import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import com.wpcc.userorderservice.common.exception.InsufficientStockException;
+import com.wpcc.userorderservice.common.exception.ResourceNotFoundException;
 import com.wpcc.userorderservice.product.mapper.DatabaseProduct;
 import com.wpcc.userorderservice.product.mapper.ProductMapper;
 
@@ -51,7 +53,7 @@ class ProductStockServiceTest {
   void rejectsMissingProduct() {
     when(productMapper.findById(10L)).thenReturn(Optional.empty());
 
-    IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+    ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class,
         () -> productStockService.decreaseStock(10L, 1));
 
     assertEquals("商品不存在：10", exception.getMessage());
@@ -62,7 +64,7 @@ class ProductStockServiceTest {
   void rejectsInsufficientStock() {
     when(productMapper.findById(10L)).thenReturn(Optional.of(productWithStock(2)));
 
-    assertThrows(IllegalArgumentException.class,
+    assertThrows(InsufficientStockException.class,
         () -> productStockService.decreaseStock(10L, 3));
 
     verify(productMapper, never()).decreaseStock(10L, 3);
@@ -73,7 +75,7 @@ class ProductStockServiceTest {
     when(productMapper.findById(10L)).thenReturn(Optional.of(productWithStock(5)));
     when(productMapper.decreaseStock(10L, 3)).thenReturn(0);
 
-    IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+    InsufficientStockException exception = assertThrows(InsufficientStockException.class,
         () -> productStockService.decreaseStock(10L, 3));
 
     assertEquals("库存不足：10", exception.getMessage());
