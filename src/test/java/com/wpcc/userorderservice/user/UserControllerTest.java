@@ -51,4 +51,17 @@ class UserControllerTest {
         mockMvc.perform(get("/api/users/999999"))
                 .andExpect(status().isNotFound());
     }
+
+    @Test
+    void shouldRejectInvalidUsername() throws Exception {
+        mockMvc.perform(post("/api/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"username\":\" \"}"))
+                .andExpect(status().isBadRequest());
+
+        mockMvc.perform(post("/api/users")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"username\":\"a\"}"))
+                .andExpect(status().isBadRequest());
+    }
 }

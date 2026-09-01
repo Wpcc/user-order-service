@@ -6,6 +6,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.wpcc.userorderservice.user.dto.CreateUserRequest;
 import com.wpcc.userorderservice.user.dto.UserResponse;
 
+import jakarta.validation.Valid;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,7 +25,7 @@ public class UserController {
   }
 
   @PostMapping
-  public ResponseEntity<UserResponse> createUser(@RequestBody CreateUserRequest user) {
+  public ResponseEntity<UserResponse> createUser(@Valid @RequestBody CreateUserRequest user) {
     User createUser = userService.createUser(user.username());
     return ResponseEntity.status(HttpStatus.CREATED).body(toResponse(createUser));
   }
