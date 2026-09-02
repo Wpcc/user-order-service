@@ -16,9 +16,9 @@ class JdbcUserDaoIntegrationTest {
 
   @Test
   void savesAndFindsUserWhenDatabaseEnvironmentIsConfigured() throws SQLException {
-    String url = System.getenv("DB_URL");
-    String databaseUsername = System.getenv("DB_USERNAME");
-    String password = System.getenv("DB_PASSWORD");
+    String url = System.getenv("TEST_DB_URL");
+    String databaseUsername = System.getenv("TEST_DB_USERNAME");
+    String password = System.getenv("TEST_DB_PASSWORD");
 
     Assumptions.assumeTrue(hasText(url) && hasText(databaseUsername) && hasText(password),
         "未配置数据库环境变量，跳过 JDBC 集成测试。");

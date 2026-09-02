@@ -23,9 +23,9 @@ import com.wpcc.userorderservice.product.mapper.DatabaseProduct;
 import com.wpcc.userorderservice.product.mapper.ProductMapper;
 
 @SpringBootTest
-@ActiveProfiles("local")
+@ActiveProfiles("integration")
 @Import(OrderCreationRollbackIntegrationTest.FailingOrderMapperConfiguration.class)
-@EnabledIfEnvironmentVariable(named = "DB_URL", matches = ".+")
+@EnabledIfEnvironmentVariable(named = "TEST_DB_URL", matches = ".+")
 class OrderCreationRollbackIntegrationTest {
 
   @Autowired

@@ -17,8 +17,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest
-@ActiveProfiles("local")
-@EnabledIfEnvironmentVariable(named = "DB_URL", matches = ".+")
+@ActiveProfiles("integration")
+@EnabledIfEnvironmentVariable(named = "TEST_DB_URL", matches = ".+")
 class ProductMapperIntegrationTest {
 
   @Autowired
