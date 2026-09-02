@@ -42,7 +42,7 @@ class OrderControllerTest {
     CreateOrderRequest request = new CreateOrderRequest(1L, 10L, 2);
     when(orderCreationService.create(request)).thenReturn(100L);
 
-    ResponseEntity<CreateOrderResponse> response = orderController.createOrders(request);
+    ResponseEntity<CreateOrderResponse> response = orderController.createOrder(request);
 
     assertEquals(HttpStatus.CREATED, response.getStatusCode());
     assertEquals(100L, response.getBody().orderId());

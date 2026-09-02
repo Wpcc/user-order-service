@@ -42,7 +42,7 @@ public class OrderController {
       @ApiResponse(responseCode = "409", description = "库存不足")
   })
   @PostMapping
-  public ResponseEntity<CreateOrderResponse> createOrders(@Valid @RequestBody CreateOrderRequest request) {
+  public ResponseEntity<CreateOrderResponse> createOrder(@Valid @RequestBody CreateOrderRequest request) {
     long orderId = orderCreationService.create(request);
 
     return ResponseEntity.status(HttpStatus.CREATED)

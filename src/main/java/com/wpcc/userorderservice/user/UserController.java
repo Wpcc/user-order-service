@@ -3,6 +3,7 @@ package com.wpcc.userorderservice.user;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.wpcc.userorderservice.common.exception.ResourceNotFoundException;
 import com.wpcc.userorderservice.user.dto.CreateUserRequest;
 import com.wpcc.userorderservice.user.dto.UserResponse;
 
@@ -52,7 +53,7 @@ public class UserController {
   public ResponseEntity<UserResponse> findUserById(@PathVariable long id) {
     return userService.findUserById(id)
         .map(user -> ResponseEntity.ok(toResponse(user)))
-        .orElseGet(() -> ResponseEntity.notFound().build());
+        .orElseThrow(() -> new ResourceNotFoundException("用户不存在：" + id));
   }
 
   private UserResponse toResponse(User user) {
