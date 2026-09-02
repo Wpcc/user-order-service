@@ -3,6 +3,7 @@ package com.wpcc.userorderservice.order.service;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -15,6 +16,7 @@ import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import com.wpcc.userorderservice.common.exception.InsufficientStockException;
 import com.wpcc.userorderservice.common.exception.ResourceNotFoundException;
 import com.wpcc.userorderservice.order.dto.CreateOrderRequest;
 import com.wpcc.userorderservice.order.dto.OrderPreview;
@@ -100,6 +102,20 @@ class OrderCreationServiceTest {
     verify(productStockService).decreaseStock(10L, 3);
     verify(orderMapper).insert(any(OrderInsertCommand.class));
     verify(orderMapper).insertItem(any());
+  }
+
+  @Test
+  void stopsOrderCreationWhenStockIsInsufficient() {
+    prepareValidOrder();
+    doThrow(new InsufficientStockException("库存不足：10"))
+        .when(productStockService).decreaseStock(10L, 3);
+
+    InsufficientStockException exception = assertThrows(InsufficientStockException.class,
+        () -> orderCreationService.create(new CreateOrderRequest(1L, 10L, 3)));
+
+    assertEquals("库存不足：10", exception.getMessage());
+    verify(orderMapper, never()).insert(any());
+    verify(orderMapper, never()).insertItem(any());
   }
 
   @Test
