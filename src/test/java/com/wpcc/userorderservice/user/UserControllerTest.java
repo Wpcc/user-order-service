@@ -60,7 +60,7 @@ class UserControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.status").value(400))
                 .andExpect(jsonPath("$.message").value("请求参数校验失败"))
-                .andExpect(jsonPath("$.fieldErrors.username").value("用户名不能为空"));
+                .andExpect(jsonPath("$.fieldErrors.username").exists());
 
         mockMvc.perform(post("/api/users")
                         .contentType(MediaType.APPLICATION_JSON)

@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: user-order-service
+  profiles:
+    default: local
+
+logging:
+  level:
+    com.wpcc.userorderservice: INFO
