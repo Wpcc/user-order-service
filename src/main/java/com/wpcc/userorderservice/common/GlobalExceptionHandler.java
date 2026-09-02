@@ -1,5 +1,7 @@
 package com.wpcc.userorderservice.common;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -15,10 +17,12 @@ import java.util.stream.Collectors;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+  private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
   @ExceptionHandler(MethodArgumentNotValidException.class)
   public ResponseEntity<ApiErrorResponse> handleValidationException(
       MethodArgumentNotValidException exception) {
+
     Map<String, String> fieldErrors = exception.getBindingResult()
         .getFieldErrors()
         .stream()
@@ -28,6 +32,8 @@ public class GlobalExceptionHandler {
                 Objects.requireNonNull(fieldError).getDefaultMessage(),
                 "请求参数不合法"),
             (first, ignored) -> first));
+
+    log.warn("请求参数校验失败，fieldErrors={}", fieldErrors);
 
     ApiErrorResponse response = new ApiErrorResponse(
         HttpStatus.BAD_REQUEST.value(),
@@ -40,6 +46,9 @@ public class GlobalExceptionHandler {
   @ExceptionHandler(IllegalArgumentException.class)
   public ResponseEntity<ApiErrorResponse> handleIllegalArgumentException(
       IllegalArgumentException exception) {
+
+    log.warn("非法参数：{}", exception.getMessage());
+
     ApiErrorResponse response = new ApiErrorResponse(
         HttpStatus.BAD_REQUEST.value(),
         Objects.requireNonNullElse(exception.getMessage(), "请求参数不合法"),
@@ -51,6 +60,7 @@ public class GlobalExceptionHandler {
   @ExceptionHandler(ResourceNotFoundException.class)
   public ResponseEntity<ApiErrorResponse> handleResourceNotFound(
       ResourceNotFoundException exception) {
+    log.warn("资源不存在：{}", exception.getMessage());
 
     ApiErrorResponse response = new ApiErrorResponse(
         HttpStatus.NOT_FOUND.value(),
@@ -63,6 +73,7 @@ public class GlobalExceptionHandler {
   @ExceptionHandler(InsufficientStockException.class)
   public ResponseEntity<ApiErrorResponse> handleInsufficientStock(
       InsufficientStockException exception) {
+    log.warn("库存不足：{}", exception.getMessage());
 
     ApiErrorResponse response = new ApiErrorResponse(
         HttpStatus.CONFLICT.value(),

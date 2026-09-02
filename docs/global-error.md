@@ -119,6 +119,6 @@ public class GlobalExceptionHandler {
   → MethodArgumentNotValidException
   → 返回 fieldErrors
 
-用户不存在、商品不存在、库存不足等业务失败
-→ IllegalArgumentException
-→ 返回 message，fieldErrors 为空
+  用户不存在、商品不存在、库存不足等业务失败
+  → IllegalArgumentException
+  → 返回 message，fieldErrors 为空

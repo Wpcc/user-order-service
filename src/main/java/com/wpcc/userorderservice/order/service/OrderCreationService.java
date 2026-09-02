@@ -1,7 +1,8 @@
 package com.wpcc.userorderservice.order.service;
 
 import java.math.BigDecimal;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +23,7 @@ public class OrderCreationService {
   private final ProductMapper productMapper;
   private final OrderMapper orderMapper;
   private final ProductStockService productStockService;
+  private static final Logger log = LoggerFactory.getLogger(OrderCreationService.class);
 
   public OrderCreationService(UserMapper userMapper, ProductMapper productMapper, OrderMapper orderMapper,
       ProductStockService productStockService) {
@@ -40,6 +42,12 @@ public class OrderCreationService {
 
     BigDecimal totalAmount = product.price()
         .multiply(BigDecimal.valueOf(request.quantity()));
+
+    log.info(
+        "开始创建订单，userId={}, productId={}, quantity={}",
+        request.userId(),
+        product.id(),
+        request.quantity());
 
     return new OrderPreview(
         request.userId(),
@@ -86,6 +94,11 @@ public class OrderCreationService {
       throw new IllegalStateException("创建订单详情失败");
     }
 
+    log.info(
+        "订单创建成功，orderId={}, userId={}, totalAmount={}",
+        order.getId(),
+        orderPreview.userId(),
+        orderPreview.totalAmount());
     return order.getId();
   }
 }
